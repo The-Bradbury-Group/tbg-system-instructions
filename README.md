@@ -41,7 +41,7 @@ Not every platform has an API. We don't pretend otherwise.
 | **Claude.ai Projects** | **No** | Copy/paste after Slack notification | Charlie/Paige |
 | **ClickUp AI** | **No** | Copy/paste after Slack notification | Paige |
 
-For platforms with APIs, changes deploy automatically. For platforms without, GitHub Actions posts to Slack with the changed file, diff summary, and explicit copy/paste instructions. The process is documented step-by-step in [PLAYBOOK.md](PLAYBOOK.md).
+For platforms with APIs, changes deploy automatically. For platforms without, a GitHub Actions workflow (built, pending `SLACK_WEBHOOK_URL` secret) will post to Slack with the changed file, diff summary, and explicit copy/paste instructions. Until the webhook is configured, the committer notifies the updater directly. The process is documented step-by-step in [PLAYBOOK.md](PLAYBOOK.md).
 
 The Gemini Gems constraint is real — Google has no Gems API, and `.com` / `.net` accounts are separate. Accepting copy/paste as the answer and making it as painless as possible is the honest approach.
 
@@ -61,13 +61,15 @@ Copy [TEMPLATE.md](TEMPLATE.md) to start a new instruction.
 ## How it works
 
 ```
-GitHub (source) ──┬──▶ Supabase Storage ──▶ ElevenLabs agents (auto)
+GitHub (source) ──┬──▶ Supabase Storage ──▶ ElevenLabs agents (auto, pending API key secret)
                   │
                   ├──▶ Claude API (code deploy)
                   │
                   ├──▶ Slack notification ──▶ Gemini Gems (copy/paste)
+                  │         └─ workflow built, pending webhook secret
                   │
                   └──▶ Slack notification ──▶ ClickUp AI (copy/paste)
+                            └─ workflow built, pending webhook secret
 ```
 
 ## Folder structure
@@ -95,7 +97,7 @@ tbg-system-instructions/
 1. Copy `TEMPLATE.md` to the right platform folder
 2. Write your instructions (YAML frontmatter + Markdown)
 3. Commit with format: `system(platform): description`
-4. Push — auto-sync handles ElevenLabs, Slack notifies for manual platforms
+4. Push — auto-sync handles ElevenLabs (once API key secret is set), Slack notifies for manual platforms (once webhook secret is set)
 
 See [PLAYBOOK.md](PLAYBOOK.md) for platform-specific deployment steps.
 
