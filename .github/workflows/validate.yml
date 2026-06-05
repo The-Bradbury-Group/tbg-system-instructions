@@ -1,0 +1,86 @@
+name: Validate Instructions
+
+on:
+  pull_request:
+    paths:
+      - '**/instructions.md'
+  push:
+    branches: [main]
+    paths:
+      - '**/instructions.md'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed instruction files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: '**/instructions.md'
+
+      - name: Validate YAML frontmatter
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          errors=0
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "::group::Validating $file"
+
+            # Check YAML frontmatter exists
+            if ! head -1 "$file" | grep -q '^---$'; then
+              echo "❌ Missing YAML frontmatter (must start with ---)"
+              errors=$((errors + 1))
+              echo "::endgroup::"
+              continue
+            fi
+
+            # Extract frontmatter
+            FRONTMATTER=$(sed -n '/^---$/,/^---$/p' "$file")
+
+            # Required fields
+            for field in "title:" "version:" "created:" "updated:" "author:" "platform:" "status:"; do
+              if ! echo "$FRONTMATTER" | grep -q "^$field"; then
+                echo "❌ Missing required field: $field"
+                errors=$((errors + 1))
+              fi
+            done
+
+            # Validate version format (semver)
+            VERSION=$(echo "$FRONTMATTER" | grep '^version:' | sed 's/.*"\(.*\)".*/\1/')
+            if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo "❌ Invalid version format: '$VERSION' (expected X.Y.Z)"
+              errors=$((errors + 1))
+            fi
+
+            # Validate platform value
+            PLATFORM=$(echo "$FRONTMATTER" | grep '^platform:' | sed 's/.*"\(.*\)".*/\1/')
+            VALID_PLATFORMS="elevenlabs claude-code claude-api claude-ai-projects gemini-gems clickup"
+            if ! echo "$VALID_PLATFORMS" | grep -qw "$PLATFORM"; then
+              echo "❌ Invalid platform: '$PLATFORM'. Must be one of: $VALID_PLATFORMS"
+              errors=$((errors + 1))
+            fi
+
+            # Validate status value
+            STATUS=$(echo "$FRONTMATTER" | grep '^status:' | sed 's/.*"\(.*\)".*/\1/')
+            if ! echo "draft active deprecated" | grep -qw "$STATUS"; then
+              echo "❌ Invalid status: '$STATUS'. Must be: draft, active, or deprecated"
+              errors=$((errors + 1))
+            fi
+
+            # Check Version History section exists
+            if ! grep -q '### Version History' "$file"; then
+              echo "⚠️  Missing ### Version History section"
+            fi
+
+            echo "✅ $file passed"
+            echo "::endgroup::"
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "::error::$errors validation error(s) found"
+            exit 1
+          fi
+
+          echo "All validations passed ✅"

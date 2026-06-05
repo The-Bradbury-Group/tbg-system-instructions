@@ -1,0 +1,31 @@
+name: Sync ElevenLabs Agents
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'elevenlabs/**/instructions.md'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: elevenlabs/**/instructions.md
+
+      - name: Sync each changed file
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: |
+          chmod +x _scripts/sync-elevenlabs.sh
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "::group::Syncing $file"
+            ./_scripts/sync-elevenlabs.sh "$file"
+            echo "::endgroup::"
+          done
