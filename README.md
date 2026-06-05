@@ -26,7 +26,7 @@ Why not the alternatives:
 | Lightweight API (Flask/Railway) | Adds deployment surface for no benefit — Supabase Storage already IS an API |
 | Pure GitHub raw URLs | No auth, rate limiting, no caching/fallback |
 
-GitHub gives us: git history, branch/PR review workflow, diff view, commit attribution, Actions for CI/CD, and Slack integration. For a 3-person team, this is the right level of infrastructure — no more, no less.
+GitHub gives us: git history, branch/PR review workflow, diff view, commit attribution, and Actions for CI/CD. For a 3-person team, this is the right level of infrastructure — no more, no less.
 
 ## Platform Reality
 
@@ -38,10 +38,10 @@ Not every platform has an API. We don't pretend otherwise.
 | **Claude API** | Yes | Git push → Railway deploy | Charlie |
 | **Claude Code** | Yes | Git push → CLAUDE.md | Charlie |
 | **Gemini Gems** | **Partial** | App UI: copy/paste. API: `system_instruction` param, same pointer pattern | Aperna / Charlie |
-| **Claude.ai Projects** | **No** | Copy/paste after Slack notification | Charlie/Paige |
+| **Claude.ai Projects** | **No** | Copy/paste — committer creates ClickUp task for updater | Charlie/Paige |
 | **ClickUp AI** | **Partial** | UI: copy/paste. Runtime: webhook → external service fetches instructions | Paige |
 
-For platforms with APIs, changes deploy automatically. For platforms without, a GitHub Actions workflow (built, pending `SLACK_WEBHOOK_URL` secret) will post to Slack with the changed file, diff summary, and explicit copy/paste instructions. Until the webhook is configured, the committer notifies the updater directly. The process is documented step-by-step in [PLAYBOOK.md](PLAYBOOK.md).
+For platforms with APIs, changes deploy automatically. For platforms without, the committer creates a ClickUp task for the updater with a link to the changed file. The process is documented step-by-step in [PLAYBOOK.md](PLAYBOOK.md).
 
 The Gemini Gems app has no API, and `.com` / `.net` accounts are separate — app Gems require copy/paste. However, the Gemini API supports `system_instruction` as a request parameter, so programmatic usage can follow the same pointer pattern as ElevenLabs: fetch instructions from Supabase at runtime and inject via API. Two audiences, two paths.
 
@@ -65,11 +65,9 @@ GitHub (source) ──┬──▶ Supabase Storage ──▶ ElevenLabs agents 
                   │
                   ├──▶ Claude API (code deploy)
                   │
-                  ├──▶ Slack notification ──▶ Gemini Gems (copy/paste)
-                  │         └─ workflow built, pending webhook secret
+                  ├──▶ ClickUp task ──▶ Gemini Gems app (copy/paste)
                   │
-                  └──▶ Slack notification ──▶ ClickUp AI (copy/paste)
-                            └─ workflow built, pending webhook secret
+                  └──▶ ClickUp task ──▶ Claude.ai Projects (copy/paste)
 ```
 
 ## Folder structure
@@ -97,7 +95,7 @@ tbg-system-instructions/
 1. Copy `TEMPLATE.md` to the right platform folder
 2. Write your instructions (YAML frontmatter + Markdown)
 3. Commit with format: `system(platform): description`
-4. Push — auto-sync handles ElevenLabs (once API key secret is set), Slack notifies for manual platforms (once webhook secret is set)
+4. Push — auto-sync handles ElevenLabs (once API key secret is set). For manual platforms, create a ClickUp task for the updater.
 
 See [PLAYBOOK.md](PLAYBOOK.md) for platform-specific deployment steps.
 

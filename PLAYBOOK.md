@@ -92,12 +92,13 @@ The Gemini app / AI Studio has Gems but no API to update them programmatically. 
 
 #### Step-by-step
 
-1. **You'll receive a Slack notification** when a `gemini-gems/` file is updated on GitHub. The notification includes:
+1. **Check GitHub notifications** — when a `gemini-gems/` file is updated, the committer will create a ClickUp task with:
    - Which file changed
    - What changed (diff summary)
    - A direct link to the raw file
+   - What changed (diff summary)
 
-2. **Open the raw file** from the GitHub link
+2. **Open the raw file** from the ClickUp task link
 
 3. **Copy the full content** (YAML frontmatter + Markdown body)
 
@@ -115,7 +116,7 @@ The Gemini app / AI Studio has Gems but no API to update them programmatically. 
    - Go to [gemini.google.com](https://gemini.google.com)
    - Find the same Gem, paste the same content, save
 
-9. **Confirm in Slack** — react with ✅ on the notification message
+9. **Close the ClickUp task**
 
 ### Gems to update
 
@@ -156,7 +157,7 @@ Claude.ai Projects have no API for updating project instructions programmaticall
 
 ### Step-by-step
 
-1. **You'll receive a Slack notification** when a `claude/claude-ai-projects/` file is updated
+1. **Check ClickUp** — when a `claude/claude-ai-projects/` file is updated, the committer creates a task
 
 2. **Open the raw file** from the GitHub link
 
@@ -203,9 +204,9 @@ Same pointer pattern as ElevenLabs. The Super Agent's UI instructions say "fetch
 ### Step-by-step (when static instructions change)
 
 1. Edit `clickup/` file in this repo
-2. Push — Slack notification goes to Paige
+2. Push — committer creates a ClickUp task for Paige
 3. Paige opens the Super Agent in ClickUp, pastes the updated pointer
-4. That's it — runtime instructions update automatically on next trigger
+4. Close the task — runtime instructions update automatically on next trigger
 
 ### If ClickUp ships native HTTP/API calls
 
@@ -235,4 +236,4 @@ Platform values: `elevenlabs`, `claude-code`, `claude-api`, `claude-ai-projects`
 |------|---------------|
 | Charlie | Write/edit instructions, push to GitHub, ElevenLabs sync, Claude API deploys, Claude.ai Projects updates |
 | Paige | Review instructions, ClickUp AI updates, Claude.ai Projects updates |
-| Aperna | Gemini Gems copy/paste (both .com and .net), Slack confirmation |
+| Aperna | Gemini Gems copy/paste (both .com and .net) |
