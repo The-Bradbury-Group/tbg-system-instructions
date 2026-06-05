@@ -37,13 +37,13 @@ Not every platform has an API. We don't pretend otherwise.
 | **ElevenLabs** | Yes | Git push → GitHub Actions → API | Charlie |
 | **Claude API** | Yes | Git push → Railway deploy | Charlie |
 | **Claude Code** | Yes | Git push → CLAUDE.md | Charlie |
-| **Gemini Gems** | **No** | Copy/paste after Slack notification | Aperna |
+| **Gemini Gems** | **Partial** | App UI: copy/paste. API: `system_instruction` param, same pointer pattern | Aperna / Charlie |
 | **Claude.ai Projects** | **No** | Copy/paste after Slack notification | Charlie/Paige |
 | **ClickUp AI** | **Partial** | UI: copy/paste. Runtime: webhook → external service fetches instructions | Paige |
 
 For platforms with APIs, changes deploy automatically. For platforms without, a GitHub Actions workflow (built, pending `SLACK_WEBHOOK_URL` secret) will post to Slack with the changed file, diff summary, and explicit copy/paste instructions. Until the webhook is configured, the committer notifies the updater directly. The process is documented step-by-step in [PLAYBOOK.md](PLAYBOOK.md).
 
-The Gemini Gems constraint is real — Google has no Gems API, and `.com` / `.net` accounts are separate. Accepting copy/paste as the answer and making it as painless as possible is the honest approach.
+The Gemini Gems app has no API, and `.com` / `.net` accounts are separate — app Gems require copy/paste. However, the Gemini API supports `system_instruction` as a request parameter, so programmatic usage can follow the same pointer pattern as ElevenLabs: fetch instructions from Supabase at runtime and inject via API. Two audiences, two paths.
 
 ## Format
 

@@ -77,16 +77,20 @@ This repo tracks the templates and shared instructions that feed into CLAUDE.md 
 
 ---
 
-## Gemini Gems (Manual)
+## Gemini Gems (Partial)
 
-**Owner:** Aperna
-**Update method:** Copy/paste
+**Owner:** Aperna (app UI), Charlie (API)
+**Update method:** Two paths — copy/paste for app Gems, dynamic injection for API
 
-### Why manual
+### Path A: App UI Gems (copy/paste)
 
-Google has no API for Gemini Gems. Instructions must be pasted into the Gem editor UI. Additionally, `.com` and `.net` accounts are separate — the same instructions must be pasted twice.
+For Gems used interactively in the Gemini app. These have no API and must be updated manually. Also, `.com` and `.net` accounts are separate — same instructions pasted twice.
 
-### Step-by-step
+#### Why manual
+
+The Gemini app / AI Studio has Gems but no API to update them programmatically. No API access to Gems created in the app exists.
+
+#### Step-by-step
 
 1. **You'll receive a Slack notification** when a `gemini-gems/` file is updated on GitHub. The notification includes:
    - Which file changed
@@ -119,6 +123,25 @@ Google has no API for Gemini Gems. Instructions must be pasted into the Gem edit
 |-----|------|:----:|:----:|
 | Solomon Interview | `gemini-gems/solomon-interview/instructions.md` | ✓ | ✓ |
 | Course Tutor | `gemini-gems/course-tutor/instructions.md` | ✓ | ✓ |
+
+### Path B: Gemini API (dynamic — Charlie)
+
+For programmatic Gemini usage. The Gemini API supports `system_instruction` as a request parameter — same pattern as Claude API.
+
+#### Architecture
+
+```
+GitHub (source) → Supabase Storage → fetch at runtime → Gemini API system_instruction param
+```
+
+The backend fetches the latest instructions from Supabase on each API call. No copy/paste needed. Full git history on every instruction change.
+
+#### When to use each path
+
+| Use case | Path | Owner |
+|----------|------|-------|
+| Interactive Gem in app UI (non-technical use) | A — copy/paste | Aperna |
+| Programmatic Gemini API calls (backend, automation) | B — dynamic fetch | Charlie |
 
 ---
 
