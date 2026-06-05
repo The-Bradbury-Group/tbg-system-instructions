@@ -152,25 +152,41 @@ Claude.ai Projects have no API for updating project instructions programmaticall
 ## ClickUp AI (Partial)
 
 **Owner:** Paige
-**Update method:** Copy/paste (Super Agent UI) + Doc reference (for knowledge source)
+**Update method:** Hybrid — static UI config + runtime webhook fetch
 
 ### Why partial
 
-ClickUp has no public API to set Super Agent instructions programmatically. Super Agents have instructions, knowledge sources, memory, and skills — all UI-configured.
+ClickUp has no public API to set Super Agent instructions programmatically. The Super Agent's static instructions in the UI are a thin pointer — rarely changed. The real system prompt is fetched at runtime via the webhook pattern.
 
-### What you CAN do
+### Architecture
 
-1. **Update the Super Agent's instructions** manually in the ClickUp UI (copy from this repo)
-2. **Attach a ClickUp Doc as a knowledge source** — that Doc can mirror content from this repo
-3. **Use the "Knowledge" section** to point to connected apps (Google Drive)
+```
+ClickUp trigger → webhook → external service → fetch instructions from Supabase → process → write response back to ClickUp
+```
 
-### Step-by-step
+Same pointer pattern as ElevenLabs. The Super Agent's UI instructions say "fetch your full instructions from [URL]." The orchestration layer does the rest.
 
-1. Open the relevant file from `clickup/` in this repo
-2. Copy the content
-3. Go to ClickUp → Super Agents → find the agent
-4. Paste into the instructions field
-5. Save
+### What's manual
+
+1. The Super Agent's static UI instructions (thin pointer — update rarely, maybe once per quarter)
+2. Agent configuration (tools, memory, knowledge sources)
+
+### What's automated
+
+1. **Runtime instruction injection** — webhook → external service fetches latest from Supabase
+2. **Instruction updates** — edit in GitHub, service picks up changes on next trigger
+3. **Version history** — full git log on all instruction changes
+
+### Step-by-step (when static instructions change)
+
+1. Edit `clickup/` file in this repo
+2. Push — Slack notification goes to Paige
+3. Paige opens the Super Agent in ClickUp, pastes the updated pointer
+4. That's it — runtime instructions update automatically on next trigger
+
+### If ClickUp ships native HTTP/API calls
+
+This entire path flips to auto. The feature request exists but isn't shipped yet.
 
 ---
 

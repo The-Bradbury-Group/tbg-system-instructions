@@ -39,7 +39,7 @@ Not every platform has an API. We don't pretend otherwise.
 | **Claude Code** | Yes | Git push → CLAUDE.md | Charlie |
 | **Gemini Gems** | **No** | Copy/paste after Slack notification | Aperna |
 | **Claude.ai Projects** | **No** | Copy/paste after Slack notification | Charlie/Paige |
-| **ClickUp AI** | **No** | Copy/paste after Slack notification | Paige |
+| **ClickUp AI** | **Partial** | UI: copy/paste. Runtime: webhook → external service fetches instructions | Paige |
 
 For platforms with APIs, changes deploy automatically. For platforms without, a GitHub Actions workflow (built, pending `SLACK_WEBHOOK_URL` secret) will post to Slack with the changed file, diff summary, and explicit copy/paste instructions. Until the webhook is configured, the committer notifies the updater directly. The process is documented step-by-step in [PLAYBOOK.md](PLAYBOOK.md).
 
